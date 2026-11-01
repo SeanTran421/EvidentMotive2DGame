@@ -10,13 +10,21 @@ public class Player : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
+    public float dashSpeed;
+    public float dashDuration;
+    public float dashCooldown;
 
     private Rigidbody2D rb;
     private bool isGrounded;
 
+    private Animator animation;
+    private bool isDashing;
+    private facingDirection;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animation = GetComponent<Animator>();
     }
 
 
@@ -45,11 +53,33 @@ public class Player : MonoBehaviour
             rb.linearVelocity.y
         );
 
-
+        SetAnimation(moveInput);
 
     }
     private void FixedUpdate()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+    }
+
+    private void SetAnimation(float moveInput)
+    {
+        if (isGrounded)
+        {
+            if(moveInput == 0)
+            {
+                animation.Play("Player_Idle");
+            }
+            else
+            {
+                animation.Play("Player_Run");
+            }
+        }
+        else
+        {
+            if(rb.linearVelocityY > 0 || rb.linearVelocityY < 0)
+            {
+                animation.Play("Player_Jump");
+            }
+        }
     }
 }
