@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     public float dashSpeed = 15f;
     public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
+    public AudioClip jump;
+    public AudioClip dash;
 
     private Rigidbody2D rb;
     private bool isGrounded;
@@ -24,11 +26,15 @@ public class Player : MonoBehaviour
     private float dashTimer = 0f;
     private float cooldownTimer = 0f;
     private Vector3 spawnPosition;
+    private AudioSource audioSource;
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animation = GetComponent<Animator>();
+        spawnPosition = transform.position;
+        audioSource = GetComponent<AudioSource>();
     }
 
 
@@ -50,6 +56,7 @@ public class Player : MonoBehaviour
         {
 
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            audioSource.PlayOneShot(jump);
         }
 
         if (moveInput !=  0)
@@ -65,6 +72,8 @@ public class Player : MonoBehaviour
                 facingDirection * dashSpeed,
                 rb.linearVelocityY
             );
+
+            audioSource.PlayOneShot(dash);
 
             dashTimer = dashDuration;
             cooldownTimer = dashCooldown;
@@ -128,7 +137,14 @@ public class Player : MonoBehaviour
 
         if (other.CompareTag("Hazard"))
         {
-            Debug.Log("Player died!");
+            //Debug.Log("Player died!");
+            transform.position = spawnPosition;
+            rb.linearVelocity = Vector2.zero;
+        }
+
+        if (other.CompareTag("Finish"))
+        {
+            Debug.Log("Player wins!");
         }
             
     }
