@@ -16,6 +16,8 @@ public class Player : MonoBehaviour
     public float dashCooldown = 1f;
     public AudioClip jump;
     public AudioClip dash;
+    public AudioClip death;
+    public GameObject levelCompletePanel;
 
     private Rigidbody2D rb;
     private bool isGrounded;
@@ -138,6 +140,7 @@ public class Player : MonoBehaviour
         if (other.CompareTag("Hazard"))
         {
             //Debug.Log("Player died!");
+            audioSource.PlayOneShot(death);
             transform.position = spawnPosition;
             rb.linearVelocity = Vector2.zero;
         }
@@ -145,6 +148,7 @@ public class Player : MonoBehaviour
         if (other.CompareTag("Finish"))
         {
             Debug.Log("Player wins!");
+            levelCompletePanel.SetActive(true);
         }
             
     }
