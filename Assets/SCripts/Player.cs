@@ -1,4 +1,5 @@
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,16 +11,19 @@ public class Player : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
-    public float dashSpeed;
-    public float dashDuration;
-    public float dashCooldown;
+    public float dashSpeed = 15f;
+    public float dashDuration = 0.2f;
+    public float dashCooldown = 1f;
 
     private Rigidbody2D rb;
     private bool isGrounded;
 
     private Animator animation;
-    private bool isDashing;
-    private facingDirection;
+    private bool isDashing = false;
+    private float facingDirection = 1f;
+    private float dashTimer = 0f;
+    private float cooldownTimer = 0f;
+    private Vector3 spawnPosition;
 
     void Start()
     {
@@ -48,12 +52,50 @@ public class Player : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
-        rb.linearVelocity = new Vector2(
+        if (moveInput !=  0)
+        {
+            facingDirection = moveInput;
+        }
+
+        if ((Keyboard.current.xKey.wasPressedThisFrame || Keyboard.current.kKey.wasPressedThisFrame) && isDashing == false && cooldownTimer <= 0)
+        {
+            isDashing = true;
+
+            rb.linearVelocity = new Vector2(
+                facingDirection * dashSpeed,
+                rb.linearVelocityY
+            );
+
+            dashTimer = dashDuration;
+            cooldownTimer = dashCooldown;
+        }
+
+        if (isDashing == true)
+        {
+            dashTimer -= Time.deltaTime;
+
+            if(dashTimer <= 0)
+            {
+                isDashing = false;
+            }
+        }
+
+        if (cooldownTimer > 0)
+        {
+            cooldownTimer -= Time.deltaTime;
+        }
+
+        if (isDashing == false)
+        {
+            rb.linearVelocity = new Vector2(
             moveInput * moveSpeed,
             rb.linearVelocity.y
-        );
+            );
+        }
 
         SetAnimation(moveInput);
+
+        
 
     }
     private void FixedUpdate()
@@ -82,4 +124,13 @@ public class Player : MonoBehaviour
             }
         }
     }
+    private void OnTriggerEnter2D(Collider2D other){
+
+        if (other.CompareTag("Hazard"))
+        {
+            Debug.Log("Player died!");
+        }
+            
+    }
 }
+
