@@ -14,4 +14,9 @@ public class LevelCompleteManager : MonoBehaviour
         SceneManager.LoadScene("TutorialLevel");
     }
 
+    public void Level1Start()
+    {
+        SceneManager.LoadScene("Level1");
+    }
+
 }
